@@ -1,0 +1,47 @@
+Package: taxogeno
+Title: Comparative Phylogenetic Analysis of Complete Proteomes
+Version: 0.1.0
+Authors@R: c(
+    person(given = "Javier",
+           family = "Méndez Gómez",
+           role = c("aut", "cre"),
+           email = "jmg.jmengom@gmail.com"),
+  )
+Description: A comprehensive ETL (Extract-Transform-Load) system for processing,
+    storing, and analyzing complete proteomes functionally annotated by Sma3s.
+    The package builds a normalized PostgreSQL database with functional annotations
+    (GO, GO Slim, Keywords, EC, Pathways), protein sequences, taxonomic relationships,
+    and Euclidean distance matrices between proteomes. Includes a Shiny application
+    for interactive exploration and visualization of phylogenetic relationships.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 4.0)
+Imports: 
+    DBI,
+    RPostgres,
+    uuid,
+    tools,
+    parallel
+Suggests: 
+    shiny,
+    shinyTree,
+    ggplot2,
+    ggiraph,
+    DT,
+    jsonlite,
+    knitr,
+    rmarkdown,
+    testthat
+SystemRequirements: 
+    PostgreSQL (>= 12) with pl/R and XML extensions,
+    Perl (for load_ncbi_taxonomy.pl),
+    OWLTools (for GO Slim mapping),
+    BioSQL schema,
+    wget (for external database downloads)
+VignetteBuilder: knitr
+URL: https://github.com/jmengom/taxogeno
+BugReports: https://github.com/jmengom/taxogeno/issues

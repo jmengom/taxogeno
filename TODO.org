@@ -1,0 +1,97 @@
+
+* STARTED Reform complete project to a standard R package structure.
+** Files processed
+- [x] taxogeno_library.R
+- [x] taxogeno_init.R -> initializeTaxogeno(dbConn)
+- [x] taxogeno_loadProteomes.R -> Deleted
+- [x] taxogeno_shinyApp.R
+
+** STARTED Rewrite README.md and switch to english
+
+** TODO Rewrite and check biosql initialization.
+
+** TODO Rewrite and check installation.
+
+** DONE Document functions and extract them to single files.
+ - [x]  readMultifasta
+ - [x]  extractColumnDfFromInsertedGeneAnnotationDf
+ - [x]  ncbiAssemblyInfoFromGcaIdContainingString
+ - [x]  updateNcbiAssemblyInfoForProteomeIdVec
+ - [x]  generateGafDf
+ - [x]  owltoolsMap2SlimGafDf
+ - [x]  convertGafToSummaryDf
+ - [x]  saveGeneratedGoslimSummaryForGoStrictAnnotationData
+ - [x]  chunkVectorInEqualSizeFragments 
+ - [x]  getNormalizedAnnotationForProteomeIdVec
+ - [x]  getKeywordNormalizedAnnotationForProteomeIdVec
+ - [x]  getGeneratedGoslimNormalizedAnnotationForProteomeIdVec
+ - [x]  distAsDf
+ - [x]  calculateEuclideanDistances
+ - [x]  saveEuclideanDistancesForProteomeId
+ - [x]  saveKeywordEuclideanDistancesForProteomeId
+ - [x]  saveGeneratedGoslimEuclideanDistancesForProteomeId
+ - [x]  saveSma3sFileSet
+ - [x]  updateProteomeFieldInDB
+ - [x]  getLastProteomeId
+ - [x]  deleteProteome
+ - [x]  updateNcbiAssemblySummaryGenbank
+ - [x]  updateBiosqlNcbiTaxonomy
+ - [x]  updateUniprotKeyword
+ - [x]  updateGeneOntology
+
+** TODO Recheck header documentation for reubicated functions.
+ - [ ]  readMultifasta
+ - [ ]  e tractColumnDfFromInsertedGeneAnnotationDf
+ - [ ]  ncbiAssemblyInfoFromGcaIdContainingString
+ - [ ]  updateNcbiAssemblyInfoForProteomeIdVec
+ - [ ]  generateGafDf
+ - [ ]  owltoolsMap2SlimGafDf
+ - [ ]  convertGafToSummaryDf
+ - [ ]  saveGeneratedGoslimSummaryForGoStrictAnnotationData
+ - [ ]  chunkVectorInEqualSizeFragments 
+ - [ ]  getNormalizedAnnotationForProteomeIdVec
+ - [ ]  getKeywordNormalizedAnnotationForProteomeIdVec
+ - [ ]  getGeneratedGoslimNormalizedAnnotationForProteomeIdVec
+ - [ ]  distAsDf
+ - [ ]  calculateEuclideanDistances
+ - [ ]  saveEuclideanDistancesForProteomeId
+ - [ ]  saveKeywordEuclideanDistancesForProteomeId
+ - [ ]  saveGeneratedGoslimEuclideanDistancesForProteomeId
+ - [ ]  saveSma3sFileSet
+ - [ ]  updateProteomeFieldInDB
+ - [ ]  getLastProteomeId
+ - [ ]  deleteProteome
+ - [ ]  updateNcbiAssemblySummaryGenbank
+ - [ ]  updateBiosqlNcbiTa onomy
+ - [ ]  updateUniprotKeyword
+ - [ ]  updateGeneOntology
+
+ 
+** TODO Check inline documentation for reubicated functions.
+ - [ ]  readMultifasta
+ - [ ]  e tractColumnDfFromInsertedGeneAnnotationDf
+ - [ ]  ncbiAssemblyInfoFromGcaIdContainingString
+ - [ ]  updateNcbiAssemblyInfoForProteomeIdVec
+ - [ ]  generateGafDf
+ - [ ]  owltoolsMap2SlimGafDf
+ - [ ]  convertGafToSummaryDf
+ - [ ]  saveGeneratedGoslimSummaryForGoStrictAnnotationData
+ - [ ]  chunkVectorInEqualSizeFragments 
+ - [ ]  getNormalizedAnnotationForProteomeIdVec
+ - [ ]  getKeywordNormalizedAnnotationForProteomeIdVec
+ - [ ]  getGeneratedGoslimNormalizedAnnotationForProteomeIdVec
+ - [ ]  distAsDf
+ - [ ]  calculateEuclideanDistances
+ - [ ]  saveEuclideanDistancesForProteomeId
+ - [ ]  saveKeywordEuclideanDistancesForProteomeId
+ - [ ]  saveGeneratedGoslimEuclideanDistancesForProteomeId
+ - [ ]  saveSma3sFileSet
+ - [ ]  updateProteomeFieldInDB
+ - [ ]  getLastProteomeId
+ - [ ]  deleteProteome
+ - [ ]  updateNcbiAssemblySummaryGenbank
+ - [ ]  updateBiosqlNcbiTa onomy
+ - [ ]  updateUniprotKeyword
+ - [ ]  updateGeneOntology
+
+    

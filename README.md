@@ -1,23 +1,23 @@
-# Taxogeno
+# taxogeno
 
-**Sistema de análisis filogenético comparativo basado en anotaciones funcionales de proteomas completos**
-
----
-
-## Descripción
-
-Taxogeno es un sistema ETL (Extract-Transform-Load) para el procesamiento, almacenamiento y análisis comparativo de proteomas completos anotados funcionalmente. El sistema procesa la salida del programa [Sma3s](https://github.com/UPOBioinfo/sma3s) —desarrollado por el Dr. Antonio J. Pérez Pulido del Departamento de Bioinformática de la UPO— y construye una base de datos normalizada con:
-
-- Anotaciones funcionales (GO, GO Slim, Keywords, EC, Pathways)
-- Secuencias de proteínas
-- Relaciones taxonómicas
-- Matrices de distancias euclídeas entre proteomas
-
-El sistema se implementó durante las prácticas del **Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web** en el Departamento de Bioinformática de la Universidad Pablo de Olavide.
+**Comparative Phylogenetic Analysis System Based on Functional Annotations of Complete Proteomes**
 
 ---
 
-## Arquitectura del Sistema
+## Description
+
+**taxogeno** is a comprehensive R package implementing an ETL (Extract-Transform-Load) system for processing, storing, and analyzing complete proteomes functionally annotated by [Sma3s](https://github.com/UPOBioinfo/sma3s) — developed by Dr. Antonio J. Pérez Pulido at the UPO Department of Bioinformatics. The package builds a normalized PostgreSQL database with:
+
+- Functional annotations (GO, GO Slim, Keywords, EC, Pathways)
+- Protein sequences
+- Taxonomic relationships
+- Euclidean distance matrices between proteomes
+
+The system was developed during the **Higher Degree in Web Application Development** training period at the **Department of Bioinformatics, Universidad Pablo de Olavide**.
+
+---
+
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -26,12 +26,12 @@ El sistema se implementó durante las prácticas del **Ciclo Formativo de Grado 
 │                                                                         │
 │  ┌───────────────┐     ┌───────────────┐     ┌────────────────────┐    │
 │  │  Sma3s TSV    │────▶│  readSma3s    │────▶│  PostgreSQL        │    │
-│  │  (anotación)  │     │  Annotation   │     │  (taxogeno db)     │    │
+│  │  (annotation) │     │  Annotation   │     │  (taxogeno db)     │    │
 │  └───────────────┘     └───────────────┘     └────────────────────┘    │
 │                                                                         │
 │  ┌───────────────┐     ┌───────────────┐     ┌────────────────────┐    │
-│  │  FASTA        │────▶│  readMultif-  │────▶│  Tablas:           │    │
-│  │  (proteoma)   │     │  asta         │     │  - proteome        │    │
+│  │  FASTA        │────▶│  readMultif-  │────▶│  Tables:           │    │
+│  │  (proteome)   │     │  asta         │     │  - proteome        │    │
 │  └───────────────┘     └───────────────┘     │  - gene            │    │
 │                                              │  - gene_goc_rel    │    │
 │  ┌───────────────┐     ┌───────────────┐     │  - gene_gof_rel    │    │
@@ -40,232 +40,249 @@ El sistema se implementó durante las prácticas del **Ciclo Formativo de Grado 
 │  └───────────────┘     └───────────────┘     │  - gene_enzyme_rel │    │
 │                                              │  - gene_pathway_rel│    │
 │  ┌───────────────┐     ┌───────────────┐     │  - generated_goslim│    │
-│  │  Cálculo de   │────▶│  Matriz de    │────▶│    _summary        │    │
-│  │  distancias   │     │  distancias   │     │  - euclidean_      │    │
-│  │  euclídeas    │     │  (caché)      │     │    distances_*     │    │
+│  │  Euclidean    │────▶│  Distance     │────▶│    _summary        │    │
+│  │  Distance     │     │  Matrix       │     │  - euclidean_      │    │
+│  │  Calculation  │     │  (cached)     │     │    distances_*     │    │
 │  └───────────────┘     └───────────────┘     └────────────────────┘    │
 │                                              │                         │
 │                                              ▼                         │
 │                              ┌───────────────────────────────┐         │
 │                              │  Shiny Application (R/Shiny)  │         │
-│                              │  - Consulta interactiva       │         │
-│                              │  - Visualización de árboles   │         │
-│                              │  - Comparación de proteomas   │         │
+│                              │  - Interactive queries        │         │
+│                              │  - Tree visualization         │         │
+│                              │  - Proteome comparison        │         │
 │                              └───────────────────────────────┘         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Tecnologías Utilizadas
-
-| Tecnología | Componente | Uso |
-|:-----------|:-----------|:----|
-| **R** | `taxogeno_library.R`, `taxogeno_shinyApp.R` | Lenguaje principal: procesamiento de datos, análisis estadístico, aplicación web |
-| **PostgreSQL 12+** | `sql/taxogeno_full.sql` | Motor de base de datos con soporte JSONB, XML y funciones recursivas |
-| **pl/R** | Procedimientos almacenados | Integración R-PostgreSQL para funciones estadísticas dentro de la BD |
-| **Shiny** | `taxogeno_shinyApp.R` | Aplicación web interactiva para exploración y visualización |
-| **OWLTools** | `bin/owltools` | Mapeo de términos GO a GO Slim |
-| **BioSQL** | `sql/biosql_pgsql.sql` | Esquema para almacenamiento de taxonomía NCBI |
-| **parallel** | `library(parallel)` | Procesamiento paralelo en cálculos de distancia |
-
----
-
-## Estructura del Repositorio
+## Package Structure
 
 ```
 taxogeno/
-├── taxogeno_library.R          # Biblioteca R: todas las funciones ETL
-├── taxogeno_loadProteomes.R    # Script de carga masiva (secuencial)
-├── taxogeno_init.R             # Inicialización de bases de datos externas
-├── taxogeno_shinyApp.R         # Aplicación Shiny (interfaz web)
-├── install.sh                  # Script de instalación automatizada
-├── THIRD_PARTY.md              # Licencias de terceros
-├── bin/
-│   ├── owltools                # Herramienta de mapeo GO
-│   └── load_ncbi_taxonomy.pl   # Script Perl para carga de taxonomía NCBI
-└── sql/
-    ├── taxogeno_full.sql       # Esquema completo: tablas, funciones, procedimientos
-    └── biosql_pgsql.sql        # Esquema BioSQL (taxonomía)
+├── R/                              # Core R functions
+│   ├── taxogeno-package.R          # Package documentation
+│   ├── readSma3sAnnotation.R       # Read Sma3s TSV files
+│   ├── readMultifasta.R            # Read FASTA files (streaming)
+│   ├── extractColumnDfFromInsertedGeneAnnotationDf.R
+│   ├── ncbiAssemblyInfoFromGcaIdContainingString.R
+│   ├── updateNcbiAssemblyInfoForProteomeIdVec.R
+│   ├── generateGafDf.R             # Gene Association Format
+│   ├── owltoolsMap2SlimGafDf.R     # GO Slim mapping
+│   ├── convertGafToSummaryDf.R
+│   ├── saveGeneratedGoslimSummaryForGoStrictAnnotationData.R
+│   ├── chunkVectorInEqualSizeFragments.R
+│   ├── getNormalizedAnnotationForProteomeIdVec.R
+│   ├── getKeywordNormalizedAnnotationForProteomeIdVec.R
+│   ├── getGeneratedGoslimNormalizedAnnotationForProteomeIdVec.R
+│   ├── distAsDf.R                  # Convert dist objects
+│   ├── calculateEuclideanDistances.R
+│   ├── saveEuclideanDistancesForProteomeId.R
+│   ├── saveKeywordEuclideanDistancesForProteomeId.R
+│   ├── saveGeneratedGoslimEuclideanDistancesForProteomeId.R
+│   ├── saveSma3sFileSet.R          # Main ETL pipeline
+│   ├── updateProteomeFieldInDB.R
+│   ├── getLastProteomeId.R
+│   ├── deleteProteome.R
+│   ├── updateNcbiAssemblySummaryGenbank.R
+│   ├── updateBiosqlNcbiTaxonomy.R
+│   ├── updateUniprotKeyword.R
+│   ├── updateGeneOntology.R
+│   ├── initializeTaxogeno.R        # One-time database setup
+│   └── webApp/
+│       ├── webAppFunctions.R
+│       ├── webAppServer.R
+│       └── webAppUi.R
+├── inst/
+│   ├── sql/
+│   │   ├── taxogeno_full.sql       # Complete database schema
+│   │   └── biosql_pgsql.sql        # BioSQL taxonomy schema
+│   └── webApp/
+│       └── webApp.R                # Shiny application entry point
+├── DESCRIPTION
+├── NAMESPACE
+├── README.md
+└── TODO.org
 ```
 
 ---
 
-## Procesamiento de Datos: ETL
+## Data Processing: ETL Pipeline
 
-### 1. Extracción: Lectura de Datos No Estructurados
+### 1. Extraction: Reading Unstructured Data
 
-#### `readSma3sAnnotation(sma3sAnnotationPath)`
+#### `readSma3sAnnotation()`
 
-Convierte el TSV generado por Sma3s en un dataframe estructurado. El TSV contiene campos separados por tabulador que incluyen:
+Converts the Sma3s-generated TSV into a structured data frame. The TSV contains tab-separated fields including:
 
 ```r
-# Columnas leídas:
+# Columns read:
 fastaheader | genename | genedescription | enzyme | goc | gocname | gof | gofname | gop | gopname | keyword | pathway | goslim
 ```
 
-La función extrae la cabecera corta del FASTA (`fastashortheader`) para su uso como identificador único dentro del proteoma.
+The function extracts the short FASTA header (`fastashortheader`) for use as a unique identifier within the proteome.
 
-#### `readMultifasta(multifastaPath)`
+#### `readMultifasta()`
 
-Procesa archivos FASTA de gran tamaño **línea a línea** para evitar cargar el contenido completo en RAM:
+Processes large FASTA files **line by line** to avoid loading the entire contents into RAM:
 
 ```r
-# Lectura incremental con file() y readLines()
-fileConn = file(multifastaPath, "r")
+# Incremental reading with file() and readLines()
+fileConn <- file(multifastaPath, "r")
 while (TRUE) {
-    oneLine = readLines(fileConn, n = 1)
-    # Procesamiento de cabeceras (>id) y secuencias
+    oneLine <- readLines(fileConn, n = 1)
+    # Process headers (>id) and sequences
     # ...
 }
 close(fileConn)
 ```
 
-**Estrategia de control de memoria:** Cada proteoma puede contener miles de secuencias. El procesamiento línea a línea permite manejar archivos de varios GB sin superar los límites de memoria del sistema.
+**Memory Management Strategy:** Each proteome may contain thousands of sequences. Line-by-line processing allows handling of multi-GB files without exceeding system memory limits.
 
 ---
 
-### 2. Transformación: De No Estructurado a Estructurado
+### 2. Transformation: From Unstructured to Structured
 
 #### `extractColumnDfFromInsertedGeneAnnotationDf()`
 
-Convierte campos con valores múltiples separados por `;` en relaciones 1:N:
+Converts semicolon-separated fields into 1:N relationships:
 
 ```r
-# Entrada: geneid | enzyme
+# Input:  geneid | enzyme
 #         1      | EC1;EC2;EC3
-# Salida:  geneid | ec
-#          1      | EC1
-#          1      | EC2
-#          1      | EC3
+# Output: geneid | ec
+#         1      | EC1
+#         1      | EC2
+#         1      | EC3
 colVecList <- strsplit(insertedGeneAnnotationDf[,colName], ";")
 geneidVec <- rep(insertedGeneAnnotationDf[,"geneid"], lengths(colVecList))
 colVec <- unlist(colVecList)
 outputDf <- data.frame(geneidVec, colVec)
 ```
 
-Este patrón se aplica a:
+This pattern is applied to:
 - GO terms (goc, gof, gop) → `gene_goc_rel`, `gene_gof_rel`, `gene_gop_rel`
 - GO Slim → `gene_goslim_rel`
 - Keywords → `gene_keyword_rel`
-- Enzimas EC → `gene_enzyme_rel`
+- EC enzymes → `gene_enzyme_rel`
 - Pathways → `gene_pathway_rel`
 
-**Normalización de GO Slim mediante OWLTools:**
+**GO Slim Normalization with OWLTools:**
 
 ```r
-# Genera GAF (Gene Association Format)
+# Generate GAF (Gene Association Format)
 gafDf <- generateGafDf(dbConn, goStrictDf)
 
-# Map2slim: convierte GO terms específicos a GO Slim genéricos
+# Map2slim: convert specific GO terms to generic GO Slim terms
 mappedGafDf <- owltoolsMap2SlimGafDf(gafDf, owl="goslim_generic.owl", subset="goslim_generic")
 
-# Agrega conteos por proteoma
-summaryDf <- aggregate(dbobjectid~annotkwid, data=gafDf, length)
+# Aggregate counts per proteome
+summaryDf <- aggregate(dbobjectid ~ annotkwid, data = gafDf, length)
 ```
 
 ---
 
-### 3. Carga: Inserción en Base de Datos
+### 3. Loading: Database Insertion
 
 #### `saveSma3sFileSet()`
 
-Función central que orquesta todo el pipeline de carga:
+The central function orchestrating the entire ETL pipeline:
 
-1. **Inserción del proteoma** en `taxogeno.proteome`:
-   - Se genera un `jobid` UUID para identificación (uso en la aplicación web)
-   - Se guardan hashes MD5 para verificación de integridad
+1. **Insert proteome** into `taxogeno.proteome`:
+   - Generates a `jobid` UUID for identification (used in the web application)
+   - Saves MD5 hashes for integrity verification
 
-2. **Inserción de genes** en `taxogeno.gene`:
-   - Cada gen recibe un `geneid` serial autogenerado
-   - Se vinculan las secuencias de aminoácidos desde el multifasta
+2. **Insert genes** into `taxogeno.gene`:
+   - Each gene receives an auto-generated `geneid`
+   - Amino acid sequences are linked from the multifasta
 
-3. **Inserción de relaciones 1:N**:
+3. **Insert 1:N relationships**:
    - GO terms, Keywords, EC, Pathways
-   - Cada relación se inserta en su tabla correspondiente
+   - Each relationship is inserted into its corresponding table
 
-4. **Generación de resúmenes GO Slim**:
-   - Se aplica `owltools` para mapear GO a GO Slim
-   - Se almacena en `generated_goslim_summary`
+4. **Generate GO Slim summaries**:
+   - Applies `owltools` to map GO to GO Slim
+   - Stores results in `generated_goslim_summary`
 
-5. **Cálculo de distancias euclídeas**:
-   - Se compara el nuevo proteoma con todos los existentes
-   - Los resultados se almacenan en tablas de caché
+5. **Calculate Euclidean distances**:
+   - Compares the new proteome with all existing proteomes
+   - Results are stored in cache tables
 
 ---
 
-## Cálculo de Distancias Euclídeas
+## Euclidean Distance Calculation
 
-### Procesamiento con Sparse Matrix y `dist()`
+### Processing with Sparse Matrix and `dist()`
 
 ```r
 calculateEuclideanDistances <- function(normalizedAnnotationDf) {
-    # Construye matriz dispersa: proteomeid × annotkwid
+    # Build sparse matrix: proteomeid × annotkwid
     sparseMatrix <- xtabs(annotkwrelval ~ proteomeid + annotkwid, 
-                          normalizedAnnotationDf, sparse=TRUE)
+                          normalizedAnnotationDf, sparse = TRUE)
     
-    # Calcula distancia euclídea entre filas (proteomas)
-    distObj <- dist(sparseMatrix, method="euclidean", diag=FALSE, upper=FALSE)
+    # Calculate Euclidean distance between rows (proteomes)
+    distObj <- dist(sparseMatrix, method = "euclidean", diag = FALSE, upper = FALSE)
     
-    # Convierte objeto dist a dataframe
+    # Convert dist object to data frame
     distAsDf(distObj)
 }
 ```
 
-**Normalización de anotaciones:**
+**Annotation Normalization:**
 
 ```sql
--- GO Slim: frecuencia relativa por proteoma
+-- GO Slim: relative frequency per proteome
 annotkwcount::float / genecount AS annotkwrelval
 
--- Keywords: frecuencia relativa por proteoma
+-- Keywords: relative frequency per proteome
 COUNT(tgk.keyword) / proteome.genecount AS annotkwrelval
 ```
 
-### Paralelización con `parallel`
+### Parallelization with `parallel`
 
-Taxogeno utiliza el paquete `parallel` de R para acelerar el cálculo de distancias:
+The package uses R's `parallel` package to accelerate distance calculations:
 
 ```r
 library(parallel)
 
-# El sistema está preparado para procesamiento paralelo en:
-# 1. Cálculo de distancias en fragmentos (chunks)
-# 2. Procesamiento de múltiples proteomas simultáneamente
+# The system is prepared for parallel processing in:
+# 1. Distance calculation in chunks
+# 2. Processing multiple proteomes simultaneously
 ```
 
-La estructura del código permite paralelizar los bucles de cálculo mediante `mclapply()` o `parLapply()`:
+The code structure allows parallelization of calculation loops using `mclapply()` or `parLapply()`:
 
 ```r
-# Cada fragmento (chunk) de proteomas se procesa independientemente
-for(chunkVec in chunkVectorInEqualSizeFragments(otherProteomeIdVecFiltered, n=1)) {
-    # Cálculo de distancias para un subconjunto
-    # Los resultados se acumulan en la base de datos
+# Each chunk of proteomes is processed independently
+for(chunkVec in chunkVectorInEqualSizeFragments(otherProteomeIdVecFiltered, n = 1)) {
+    # Calculate distances for a subset
+    # Results accumulate in the database
 }
 ```
 
-La paralelización no está activa por defecto en el script de carga secuencial (`taxogeno_loadProteomes.R`), pero la estructura del código lo permite mediante la función `mclapply()` del paquete `parallel` para distribuir el cálculo de distancias entre múltiples núcleos de CPU.
+Parallelization is not active by default in the sequential load script, but the code structure enables it through `mclapply()` from the `parallel` package to distribute distance calculations across multiple CPU cores.
 
-### Gestión de Memoria: Procesamiento por Fragmentos
+### Memory Management: Chunked Processing
 
 ```r
 chunkVectorInEqualSizeFragments <- function(x, n) {
     split(x, ceiling(seq_along(x)/n))
 }
 
-# Procesamiento en fragmentos de 20 proteomas (por defecto)
-for(chunkVec in chunkVectorInEqualSizeFragments(otherProteomeIdVecFiltered, n=20)) {
-    # Cálculo para n=20 proteomas a la vez
+# Process in chunks of 20 proteomes (default)
+for(chunkVec in chunkVectorInEqualSizeFragments(otherProteomeIdVecFiltered, n = 20)) {
+    # Calculate for n=20 proteomes at a time
 }
 ```
 
-**Razón técnica:** La matriz dispersa generada por `xtabs(sparse=TRUE)` puede superar varios gigabytes cuando se comparan todos los proteomas simultáneamente. El procesamiento por fragmentos (chunking) limita el uso de memoria a un subconjunto manejable.
+**Technical Rationale:** The sparse matrix generated by `xtabs(sparse = TRUE)` can exceed several gigabytes when comparing all proteomes simultaneously. Chunked processing limits memory usage to a manageable subset.
 
 ---
 
-## Modelo de Datos
+## Data Model
 
-### Esquema `taxogeno`
+### Schema `taxogeno`
 
 ```
 ┌─────────────────────┐     ┌─────────────────────┐     ┌─────────────────────┐
@@ -299,10 +316,10 @@ for(chunkVec in chunkVectorInEqualSizeFragments(otherProteomeIdVecFiltered, n=20
                           └─────────────────────────────────────┘
 ```
 
-### Tablas de Caché de Distancias
+### Distance Cache Tables
 
 ```sql
--- Índice primario compuesto garantiza unicidad (proteomeid_greatest > proteomeid_least)
+-- Composite primary key ensures uniqueness (proteomeid_greatest > proteomeid_least)
 CREATE TABLE taxogeno.euclidean_distances_generated_goslim (
     proteomeid_greatest integer REFERENCES taxogeno.proteome(proteomeid),
     proteomeid_least integer REFERENCES taxogeno.proteome(proteomeid),
@@ -312,26 +329,26 @@ CREATE TABLE taxogeno.euclidean_distances_generated_goslim (
 );
 ```
 
-**Ventaja de la tabla de caché:** Las distancias solo se calculan una vez. La tabla es consultada directamente por la aplicación Shiny sin necesidad de recalcular en tiempo real.
+**Cache Table Advantage:** Distances are calculated only once. The table is queried directly by the Shiny application without needing real-time recalculation.
 
 ---
 
-## Funciones con Queries Recursivas (CTE)
+## Recursive Queries (CTEs)
 
 ### `taxogeno.taxon_ancestors()`
 
-Obtiene todos los ancestros de un taxón dado mediante CTE recursiva:
+Gets all ancestors of a given taxon using a recursive CTE:
 
 ```sql
 WITH RECURSIVE rec_a (ncbitaxid, parent_ncbitaxid, node_rank, scientific_name, is_ancestor) AS (
-    -- Caso base: el taxón objetivo
+    -- Base case: the target taxon
     SELECT ncbitaxid, parent_ncbitaxid, node_rank, scientific_name, is_ancestor
     FROM taxogeno.taxonomy
     WHERE ncbitaxid = $1
     
     UNION ALL
     
-    -- Caso recursivo: subir al padre
+    -- Recursive case: climb to parent
     SELECT tax.ncbitaxid, tax.parent_ncbitaxid, tax.node_rank, tax.scientific_name, tax.is_ancestor
     FROM rec_a, taxogeno.taxonomy tax
     WHERE tax.ncbitaxid = rec_a.parent_ncbitaxid
@@ -342,11 +359,11 @@ SELECT * FROM rec_a;
 
 ### `taxogeno.taxon_descendants()`
 
-Obtiene todos los descendientes de un taxón mediante CTE recursiva descendente.
+Gets all descendants of a taxon using a descending recursive CTE.
 
 ### `taxogeno.taxonomy_jsonb_children()`
 
-Genera una representación JSON del árbol taxonómico para la aplicación Shiny:
+Generates a JSON representation of the taxonomic tree for the Shiny application:
 
 ```sql
 SELECT jsonb_build_object(
@@ -366,23 +383,23 @@ WHERE ncbitaxid = p_ncbitaxid;
 
 ---
 
-## Procedimientos Almacenados
+## Stored Procedures
 
 ### `taxogeno.insert_taxon()`
 
-Inserta un taxón y todos sus ancestros, utilizando `biosql.taxon_ancestors()`:
+Inserts a taxon and all its ancestors using `biosql.taxon_ancestors()`:
 
 ```r
 FOR v_pretaxonomy_rec IN (SELECT * FROM biosql.taxon_ancestors(p_ncbitaxid))
 LOOP
-    -- Determina si es ancestro o el taxón objetivo
+    -- Determine if ancestor or target taxon
     IF v_pretaxonomy_rec.ncbi_taxon_id <> p_ncbitaxid THEN
         v_is_ancestor := TRUE;
     ELSE
         v_is_ancestor := FALSE;
     END IF;
     
-    -- Inserta o actualiza con ON CONFLICT
+    -- Insert or update with ON CONFLICT
     INSERT INTO taxogeno.taxonomy(ncbitaxid, parent_ncbitaxid, node_rank, scientific_name, is_ancestor)
     VALUES (v_ncbitaxid, v_parent_ncbitaxid, v_node_rank, v_scientific_name, v_is_ancestor)
     ON CONFLICT (ncbitaxid) DO UPDATE SET ...;
@@ -391,11 +408,11 @@ END LOOP;
 
 ### `taxogeno.delete_taxon()`
 
-Elimina un taxón solo si no está referenciado por ningún proteoma. Utiliza `taxogeno.taxon_ancestors()` para identificar el conjunto completo de taxones a eliminar.
+Deletes a taxon only if not referenced by any proteome. Uses `taxogeno.taxon_ancestors()` to identify the complete set of taxa to delete.
 
 ### `taxogeno.delete_proteome()`
 
-Elimina en cascada un proteoma completo:
+Cascading deletion of a complete proteome:
 
 ```sql
 DELETE FROM taxogeno.generated_goslim_summary WHERE proteomeid = p_proteomeid;
@@ -405,7 +422,7 @@ DELETE FROM taxogeno.euclidean_distances_generated_goslim WHERE proteomeid_great
 FOR v_geneid IN (SELECT geneid FROM taxogeno.gene WHERE proteomeid = p_proteomeid) LOOP
     DELETE FROM taxogeno.gene_goc_rel WHERE geneid = v_geneid;
     DELETE FROM taxogeno.gene_gof_rel WHERE geneid = v_geneid;
-    -- ... otras tablas de relación
+    -- ... other relationship tables
     DELETE FROM taxogeno.gene WHERE geneid = v_geneid;
 END LOOP;
 
@@ -414,20 +431,20 @@ DELETE FROM taxogeno.proteome WHERE proteomeid = p_proteomeid;
 
 ---
 
-## Integración de Datos Externos
+## External Data Integration
 
-### Actualización de Bases de Datos de Referencia (`taxogeno_init.R`)
+### Reference Database Updates
 
 ```r
 updateNcbiAssemblySummaryGenbank(dbConn)  # Assembly_summary_genbank.txt
-updateBiosqlNcbiTaxonomy(dbConn)          # Taxdump NCBI (vía BioSQL)
-updateUniprotKeyword(dbConn)              # Keywords de UniProt
-updateGeneOntology(dbConn)                # GO y GO Slim (OWL)
+updateBiosqlNcbiTaxonomy(dbConn)          # NCBI Taxdump (via BioSQL)
+updateUniprotKeyword(dbConn)              # UniProt Keywords
+updateGeneOntology(dbConn)                # GO and GO Slim (OWL)
 ```
 
-### `updateGeneOntology()`: Parseo de OWL con XMLTABLE
+### `updateGeneOntology()`: OWL Parsing with XMLTABLE
 
-Descarga archivos OWL de Gene Ontology y los parsea directamente en PostgreSQL:
+Downloads Gene Ontology OWL files and parses them directly in PostgreSQL:
 
 ```sql
 INSERT INTO gene_ontology.gene_ontology (goid, golabel, goaspect)
@@ -456,99 +473,123 @@ WHERE gene_ontology.gene_ontology_xml.filename = $1
 
 ---
 
-## Aplicación Shiny
+## Shiny Web Application
 
-La aplicación web interactiva (`taxogeno_shinyApp.R`) presenta los siguientes módulos:
+The interactive web application (`inst/webApp/webApp.R`) presents the following modules:
 
 ### Step 0: Upload Proteome
-- Subida de archivos TSV y FASTA
-- Asignación de tags
-- Generación de `jobid` (UUID) para acceso posterior
+- Upload TSV and FASTA files
+- Assign tags
+- Generate `jobid` (UUID) for subsequent access
 
 ### Step 1: Select a Proteome
-- Lista de proteomas disponibles (públicos + del usuario)
-- Visualización de información general: `genecount`, `ncbitaxid`, `scientific_name`
-- Exploración de genes con sus anotaciones GO, Keywords, EC, Pathways
-- Visualización de secuencia de aminoácidos (formato con saltos de línea cada 60 caracteres)
+- List of available proteomes (public + user)
+- Display general information: `genecount`, `ncbitaxid`, `scientific_name`
+- Explore genes with their GO, Keywords, EC, Pathway annotations
+- View amino acid sequences (formatted with line breaks every 60 characters)
 
 ### Step 2: Select Reference Proteomes
-- Árbol taxonómico interactivo (`shinyTree`)
-- Selección mediante checkbox en la jerarquía de NCBI Taxonomy
+- Interactive taxonomic tree (`shinyTree`)
+- Checkbox selection in the NCBI Taxonomy hierarchy
 
 ### Step 3: Check Annotation Info
-- Boxplots interactivos (`ggiraph`) de GO Slim por aspecto:
+- Interactive boxplots (`ggiraph`) of GO Slim by aspect:
   - Molecular Function
   - Biological Process
   - Cellular Component
-- Tablas con cuartiles y rango intercuartílico
+- Tables with quartiles and interquartile range
 
 ### Step 4: Check Similarity Info
-- Tabla de distancias euclídeas con descarga CSV
-- Dendrograma (heatmap) de distancias entre proteomas seleccionados
+- Euclidean distance table with CSV download
+- Dendrogram/heatmap of distances between selected proteomes
 
 ---
 
-## Carga Masiva (`taxogeno_loadProteomes.R`)
+## Installation and Usage
 
-Procesa directorios completos con conjuntos de proteomas:
+### Installation
 
 ```r
-dirNameVec <- c("archaeas", "bacteria", "bacteria2", "mammals", "fungi", "invert", "protozoa", "vert_other")
+# Install from GitHub
+install.packages("devtools")
+devtools::install_github("jmengom/taxogeno")
 
-for(dirName in dirNameVec) {
-    # Auto-detecta archivos TSV y FASTA
-    baseNameVec <- gsub("^(.*)_uniref90_go_goslim[.]tsv$", "\\1", 
-                        list.files(path=dirNamePath, pattern=".*_uniref90_go_goslim[.]tsv"))
-    
-    # Procesa cada proteoma
-    for(rowNum in seq_len(nrow(filesDf))) {
-        start.time <- Sys.time()
-        saveSma3sFileSet(dbConn, tsvFilePath, faaFilePath, isUserProteome=FALSE)
-        end.time <- Sys.time()
-        timeTakenVec <- c(timeTakenVec, end.time - start.time)
-        print(mean(timeTakenVec))  # Muestra media acumulada
-    }
-}
+# Load the package
+library(taxogeno)
+```
+
+### Database Setup
+
+```r
+# Connect to PostgreSQL
+conn <- dbConnect(RPostgres::Postgres(),
+                  host = "localhost",
+                  dbname = "taxogeno",
+                  user = "postgres",
+                  password = "password")
+
+# Initialize the database with reference data (one-time setup)
+# This takes 10-30 minutes and requires internet access
+initializeTaxogeno(conn)
+```
+
+### Load a Proteome
+
+```r
+# Load a single proteome from Sma3s output
+jobid <- saveSma3sFileSet(
+    dbConn = conn,
+    sma3sAnnotationFilePath = "path/to/proteome_uniref90_go_goslim.tsv",
+    multifastaFilePath = "path/to/proteome.faa",
+    tagVec = c("bacteria", "example"),
+    isUserProteome = FALSE,
+    doUpdateNcbiAssemblyInfo = TRUE
+)
+
+print(paste("Upload job ID:", jobid))
 ```
 
 ---
-### Esquemas en la Base de Datos
 
-| Esquema | Contenido |
-|:--------|:----------|
-| `taxogeno` | Datos principales: proteomas, genes, anotaciones, distancias |
-| `biosql` | Taxonomía NCBI (esquema BioSQL) + funciones propias para la navegación recursiva del árbol taxonómico.|
+## Database Schemas
+
+| Schema | Contents |
+|:-------|:---------|
+| `taxogeno` | Main data: proteomes, genes, annotations, distances |
+| `biosql` | NCBI taxonomy (BioSQL schema) with custom functions for recursive navigation |
 | `ncbi` | Assembly Summary GenBank |
-| `uniprot` | Catalogs de Keywords y Proteomas UniProt |
-| `gene_ontology` | GO y GO Slim (OWL parseado) |
+| `uniprot` | Keyword catalogs and UniProt proteomes |
+| `gene_ontology` | GO and GO Slim (parsed OWL) |
 
 ---
 
-## Requisitos Técnicos
+## Technical Requirements
 
-- **PostgreSQL 12+** con extensiones: pl/R, XML
-- **R 4.0+** con paquetes: DBI, RPostgres, shiny, shinyTree, ggplot2, DT, jsonlite, uuid, parallel
-- **Perl** (para script de carga taxonómica)
-- **OWLTools** 
-- **BioSQL**
-- **wget** (para descarga de bases de datos externas)
-
----
-
-## Autoría
-
-- **Desarrollo del código en R y PostgreSQL**: Javier Méndez Gómez
-- **Supervisión y concepto del proyecto**: Dr. Antonio J. Pérez Pulido
-- **Departamento de Bioinformática**, Universidad Pablo de Olavide, Sevilla
-
-El proyecto Taxogeno fue desarrollado en 2020 como parte del módulo de Formación en Centros de Trabajo (FCT) del Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (Real Decreto 686/2010, de 20 de mayo) en el I.E.S. Hermanos Machado (Dos Hermanas, Sevilla). Las prácticas se realizaron en el Departamento de Bioinformática de la Universidad Pablo de Olavide bajo la supervisión del Dr. Antonio J. Pérez Pulido.
+- **PostgreSQL 12+** with extensions: pl/R, XML
+- **R 4.0+** with packages: DBI, RPostgres, shiny, shinyTree, ggplot2, DT, jsonlite, uuid, parallel
+- **Perl** (for taxonomy loading script)
+- **OWLTools** (for GO Slim mapping)
+- **BioSQL** (taxonomy schema)
+- **wget** (for downloading external databases)
 
 ---
 
-## Referencias
+## Authorship
+
+- **R and PostgreSQL Code Development**: Javier Méndez Gómez
+- **Project Supervision and Concept**: Dr. Antonio J. Pérez Pulido
+- **Department of Bioinformatics**, Universidad Pablo de Olavide, Seville
+
+The Taxogeno project was developed in 2020 as part of the training period (FCT) of the Higher Degree in Web Application Development (Royal Decree 686/2010, of May 20) at I.E.S. Hermanos Machado (Dos Hermanas, Seville). The internship was conducted at the Department of Bioinformatics, Universidad Pablo de Olavide, under the supervision of Dr. Antonio J. Pérez Pulido.
+
+---
+
+## References
 
 - Sma3s: [UPOBioinfo/sma3s](https://github.com/UPOBioinfo/sma3s)
 - Gene Ontology: [geneontology.org](http://geneontology.org)
 - NCBI Taxonomy: [ncbi.nlm.nih.gov/taxonomy](https://www.ncbi.nlm.nih.gov/taxonomy)
 - BioSQL: [biosql.org](http://biosql.org)
 - OWLTools: [github.com/owlcollab/owltools](https://github.com/owlcollab/owltools)
+
+---
